@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=60", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["src"]
+namespaces = false
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[project]
+name = "cacheia_middleware"
+authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
+description = "Cache middleware that allows invalidation and other shenanigans"
+readme = "README.md"
+requires-python= ">=3.12"
+keywords = ["cache", "fastapi", "middleware"]
+dynamic = ["version"]
+dependencies = [
+    "fastapi>=0.105",
+    "pydantic>2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "pytest"
+]
+local = [ "./core" ]

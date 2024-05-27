@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=60", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[project]
+name = "cacheia_client"
+authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
+description = "Client for cacheia service that allows invalidation and other shenanigans"
+readme = "README.md"
+requires-python= ">=3.12"
+keywords = ["client", "cache", "http", "service"]
+dynamic = ["version"]
+dependencies = [
+    "aiohttp"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "pytest"
+]
+local = [ "./core" ]

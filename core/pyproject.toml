@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=60", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+version_scheme = "post-release"
+local_scheme = "no-local-version"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[project]
+name = "cacheia"
+authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
+description = "Cache library that allows invalidation and other shenanigans"
+readme = "README.md"
+requires-python= ">=3.12"
+keywords = ["cache", "core", "lib"]
+dynamic = ["version"]
+dependencies = [
+    "pymongo",
+    "boto3",
+    "pydantic>2",
+    "pydantic-settings",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "isort",
+    "pytest"
+]
