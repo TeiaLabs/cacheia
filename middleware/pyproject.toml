@@ -2,13 +2,11 @@
 requires = ["setuptools>=60", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-include = ["src"]
-namespaces = false
 
 [tool.setuptools_scm]
 version_scheme = "post-release"
 local_scheme = "no-local-version"
+root = "../"
 
 [tool.black]
 line-length = 88
