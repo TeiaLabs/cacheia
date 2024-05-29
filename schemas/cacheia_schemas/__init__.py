@@ -6,6 +6,10 @@ from pydantic import BaseModel, Field
 Backends = Literal["redis", "mongo", "memory"]
 
 
+class Infostar(BaseModel):
+    pass
+
+
 class Ref(BaseModel):
     key: str
     group: str

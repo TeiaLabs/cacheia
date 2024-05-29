@@ -13,24 +13,11 @@ line-length = 88
 profile = "black"
 
 [project]
-name = "cacheia_client"
+name = "cacheia_schemas"
 authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
-description = "Client for cacheia service that allows invalidation and other shenanigans"
+description = "Schemas for cacheia library"
 readme = "README.md"
 requires-python= ">=3.12"
-keywords = ["client", "cache", "http", "service"]
+keywords = ["cache", "schemas", "lib"]
 dynamic = ["version"]
-dependencies = [
-    "aiohttp"
-]
-
-[project.optional-dependencies]
-dev = [
-    "black",
-    "isort",
-    "pytest"
-]
-local = [ "./schemas" ]
-remote = [ 
-    "cacheia_schemas@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=schemas"
-]
+dependencies = [ "pydantic>2" ]
