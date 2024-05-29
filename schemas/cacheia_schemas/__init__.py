@@ -1,20 +1,34 @@
 from datetime import datetime
-from typing import Any, Literal
+from enum import StrEnum, auto
+from typing import Any
 
 from pydantic import BaseModel, Field
 
-Backends = Literal["redis", "mongo", "memory"]
+
+class Backend(StrEnum):
+    REDIS = auto()
+    MONGO = auto()
+    MEMORY = auto()
 
 
 class Infostar(BaseModel):
-    pass
+    org_handle: str
+    service_handle: str
+
+
+class NewCachedValue(BaseModel):
+    key: str
+    value: Any
+    group: str
+    expires_at: float | None = None
+    backend: Backend = Backend.MEMORY
 
 
 class Ref(BaseModel):
     key: str
     group: str
     expires_at: float | None = None
-    backend: Backends = "memory"
+    backend: Backend = Backend.MEMORY
     created_by: Infostar
     created_at: datetime = Field(default_factory=datetime.now)
 
@@ -22,3 +36,12 @@ class Ref(BaseModel):
 class CachedValue(BaseModel):
     key: str
     value: Any
+
+
+class ValuedRef(BaseModel):
+    ref: Ref
+    value: CachedValue
+
+
+class DeletedResult(BaseModel):
+    deleted_count: int

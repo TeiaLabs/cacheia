@@ -1,5 +1,5 @@
+from cacheia import CachedValue, Ref
 from fastapi import APIRouter, Query
-from cacheia import Ref, CachedValue
 
 from .schemas import CreateRequest, Infostar
 
@@ -17,7 +17,7 @@ def cache(instance: CreateRequest, creator: Infostar) -> Ref:
 @router.get("/", status_code=200)
 def get_all_cached_values(
     creator: Infostar,
-    backend: Backends | None = None,
+    backend: Backend | None = None,
     expires_range: str | None = None,
     org_handle: str | None = None,
     service_handle: str | None = None,
@@ -52,7 +52,7 @@ def flush_all(
 @router.put("/keys/", status_code=200)
 def flush_keys(
     creator: Infostar,
-    backend: Backends | None = None,
+    backend: Backend | None = None,
     expires_range: str | None = None,
     org_handle: str | None = None,
     service_handle: str | None = None,

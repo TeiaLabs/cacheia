@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools_scm]
 version_scheme = "post-release"
 local_scheme = "no-local-version"
+root = "../"
 
 [tool.black]
 line-length = 88
@@ -34,10 +35,6 @@ dev = [
     "black",
     "isort",
     "pytest"
-]
-local = [ 
-    "./core",
-    "./schemas"
 ]
 remote = [ 
     "cacheia@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=core",

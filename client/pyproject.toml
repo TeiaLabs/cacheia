@@ -31,7 +31,6 @@ dev = [
     "isort",
     "pytest"
 ]
-local = [ "./schemas" ]
 remote = [ 
     "cacheia_schemas@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=schemas"
 ]

@@ -7,7 +7,7 @@ def create_cache_instance(instance: CreateRequest, creator: Infostar):
 
 def get_all_cached_values(
     creator: Infostar,
-    backend: Optional[Backends] = None,
+    backend: Optional[Backend] = None,
     expires_range: Optional[str] = None,
     org_handle: Optional[str] = None,
     service_handle: Optional[str] = None,
@@ -41,7 +41,7 @@ def flush_all_keys(creator: Infostar, only_expired: bool):
 
 def flush_specific_keys(
     creator: Infostar,
-    backend: Optional[Backends] = None,
+    backend: Optional[Backend] = None,
     expires_range: Optional[str] = None,
     org_handle: Optional[str] = None,
     service_handle: Optional[str] = None,
@@ -75,7 +75,7 @@ class Client:
     def get_all_cached_values(
         self,
         creator: Infostar,
-        backend: Optional[Backends] = None,
+        backend: Optional[Backend] = None,
         expires_range: Optional[str] = None,
         org_handle: Optional[str] = None,
         service_handle: Optional[str] = None,
@@ -101,7 +101,7 @@ class Client:
     def flush_specific_keys(
         self,
         creator: Infostar,
-        backend: Optional[Backends] = None,
+        backend: Optional[Backend] = None,
         expires_range: Optional[str] = None,
         org_handle: Optional[str] = None,
         service_handle: Optional[str] = None,
