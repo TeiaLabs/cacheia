@@ -94,7 +94,6 @@ class MongoClient(CacheClient):
                 key=instance.key,
                 group=instance.group,
                 expires_at=instance.expires_at,
-                backend=instance.backend,
                 created_by=creator,
             ),
             value=CachedValue(
@@ -155,7 +154,6 @@ class MongoClient(CacheClient):
                 key=key,
                 group=val["group"],
                 expires_at=val["expires_at"],
-                backend=val["backend"],
                 created_by=val["created_by"],
                 created_at=val["created_at"],
             )

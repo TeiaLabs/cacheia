@@ -68,7 +68,6 @@ class MemoryClient(CacheClient):
                 key=instance.key,
                 group=instance.group,
                 expires_at=instance.expires_at,
-                backend=instance.backend,
                 created_by=creator,
             ),
             value=CachedValue(
