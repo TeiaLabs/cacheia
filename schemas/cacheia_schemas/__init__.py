@@ -19,7 +19,7 @@ class Infostar(BaseModel):
 class NewCachedValue(BaseModel):
     key: str
     value: Any
-    group: str
+    group: str = ""
     expires_at: float | None = None
     backend: Backend = Backend.MEMORY
 
