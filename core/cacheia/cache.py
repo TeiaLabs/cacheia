@@ -10,7 +10,7 @@ from cacheia_schemas import (
     NewCachedValue,
 )
 
-from .clients import MemoryClient
+from .clients import MemoryClient, MongoClient
 from .exceptions import InvalidBackendName, InvalidExpireRange
 
 RANGE_FORMAT = re.compile(r"^(\d+)(\.\d+)?\.\.\.(\d+)(\.\d+)?$")
@@ -31,6 +31,8 @@ class Cacheia:
         match instance.backend:
             case Backend.MEMORY:
                 MemoryClient.create_cache(instance, creator)
+            case Backend.MONGO:
+                MongoClient.create_cache(instance, creator)
             case _:
                 raise InvalidBackendName(instance.backend)
 
@@ -65,10 +67,21 @@ class Cacheia:
                         expires_range=expires_range,
                         org_handle=org_handle,
                         service_handle=service_handle,
-                    )
+                    ),
+                    MongoClient.get_all(
+                        expires_range=expires_range,
+                        org_handle=org_handle,
+                        service_handle=service_handle,
+                    ),
                 )
             case Backend.MEMORY:
                 return MemoryClient.get_all(
+                    expires_range=expires_range,
+                    org_handle=org_handle,
+                    service_handle=service_handle,
+                )
+            case Backend.MONGO:
+                return MongoClient.get_all(
                     expires_range=expires_range,
                     org_handle=org_handle,
                     service_handle=service_handle,
@@ -91,6 +104,8 @@ class Cacheia:
         match backend:
             case Backend.MEMORY:
                 return MemoryClient.get(key)
+            case Backend.MONGO:
+                return MongoClient.get(key)
             case _:
                 raise InvalidBackendName(backend)
 
@@ -109,6 +124,8 @@ class Cacheia:
         match backend:
             case Backend.MEMORY:
                 return MemoryClient.flush_all(expired_only)
+            case Backend.MONGO:
+                return MongoClient.flush_all(expired_only)
             case _:
                 raise InvalidBackendName(backend)
 
@@ -143,6 +160,12 @@ class Cacheia:
                     org_handle=org_handle,
                     service_handle=service_handle,
                 )
+            case Backend.MONGO:
+                return MongoClient.flush_some(
+                    expires_range=expires_range,
+                    org_handle=org_handle,
+                    service_handle=service_handle,
+                )
             case _:
                 raise InvalidBackendName(backend)
 
@@ -159,5 +182,7 @@ class Cacheia:
         match backend:
             case Backend.MEMORY:
                 return MemoryClient.flush_key(key)
+            case Backend.MONGO:
+                return MongoClient.flush_key(key)
             case _:
                 raise InvalidBackendName(backend)
