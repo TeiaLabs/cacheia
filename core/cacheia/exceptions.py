@@ -19,7 +19,7 @@ class InvalidExpireRange(ValueError):
 
     def __init__(self, expires_range: str) -> None:
         self.expire = expires_range
-        self.message = f"Expire value '{expires_range}' is not a valid range, a valid format is '<start>...<end>'"
+        self.message = f"Expire value '{expires_range}' is not a valid range, a valid format is '<start>...<end>' where 'end' is greater than 'start'."
         super().__init__(self.message)
 
 
@@ -28,5 +28,5 @@ class InvalidBackendName(ValueError):
         backend_names = "\n-> ".join(Backend)
 
         self.backend_name = backend_name
-        self.message = f"Backend name '{backend_name}' is not a valid backend name. Valid names are:\n{backend_names}"
+        self.message = f"Backend name '{backend_name}' is not a valid backend name. Valid names are:\n-> {backend_names}"
         super().__init__(self.message)

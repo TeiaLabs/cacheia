@@ -12,8 +12,7 @@ from cacheia_schemas import (
 
 from .clients import MemoryClient, MongoClient
 from .exceptions import InvalidBackendName, InvalidExpireRange
-
-RANGE_FORMAT = re.compile(r"^(\d+)(\.\d+)?\.\.\.(\d+)(\.\d+)?$")
+from .utils import validate_range
 
 
 class Cacheia:
@@ -56,9 +55,7 @@ class Cacheia:
         :raises: InvalidBackendName if the backend is not valid.
         """
 
-        if expires_range is not None:
-            if not re.fullmatch(RANGE_FORMAT, expires_range):
-                raise InvalidExpireRange(expires_range)
+        validate_range(expires_range)
 
         match backend:
             case None:
@@ -149,9 +146,7 @@ class Cacheia:
         :raises: InvalidBackendName if the backend is not valid.
         """
 
-        if expires_range is not None:
-            if not re.fullmatch(RANGE_FORMAT, expires_range):
-                raise InvalidExpireRange(expires_range)
+        validate_range(expires_range)
 
         match backend:
             case Backend.MEMORY:
