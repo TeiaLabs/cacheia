@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     PROC_SAFE: bool = False
 
     # Mongo cache config
-    DB_URI: str = "mongodb://localhost:27107/database"
+    DB_URI: str = "mongodb://localhost:27017/database"
     USE_LOCAL_MEM: bool = True
     PRELOAD: bool = True
 
