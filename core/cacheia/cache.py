@@ -17,7 +17,12 @@ from .utils import validate_range
 
 class Cacheia:
     @classmethod
-    def create_cache(cls, instance: NewCachedValue, creator: Infostar):
+    def create_cache(
+        cls,
+        creator: Infostar,
+        backend: Backend,
+        instance: NewCachedValue,
+    ):
         """
         Create a new cache entry.
 
@@ -27,13 +32,13 @@ class Cacheia:
         :raises: InvalidBackendName if the backend is not valid.
         """
 
-        match instance.backend:
+        match backend:
             case Backend.MEMORY:
                 MemoryClient.create_cache(instance, creator)
             case Backend.MONGO:
                 MongoClient.create_cache(instance, creator)
             case _:
-                raise InvalidBackendName(instance.backend)
+                raise InvalidBackendName(backend)
 
     @classmethod
     def get_all(

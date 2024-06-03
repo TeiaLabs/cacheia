@@ -9,6 +9,7 @@ class Backend(StrEnum):
     REDIS = auto()
     MONGO = auto()
     MEMORY = auto()
+    S3 = auto()
 
 
 class Infostar(BaseModel):
@@ -21,14 +22,12 @@ class NewCachedValue(BaseModel):
     value: Any
     group: str = ""
     expires_at: float | None = None
-    backend: Backend = Backend.MEMORY
 
 
 class Ref(BaseModel):
     key: str
     group: str
     expires_at: float | None = None
-    backend: Backend = Backend.MEMORY
     created_by: Infostar
     created_at: datetime = Field(default_factory=datetime.now)
 
