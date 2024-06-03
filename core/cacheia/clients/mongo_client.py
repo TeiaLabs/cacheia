@@ -64,11 +64,14 @@ def _setup_client_info() -> tuple[Collection, Collection, dict[str, ValuedRef]]:
         return (ref_collection, value_collection, memory)  # type: ignore
 
     for ref in ref_collection.find():
-        memory[ref["key"]] = {"ref": ref}
+        memory[ref["key"]] = {"ref": Ref.model_construct(**ref)}
 
     for value in value_collection.find():
-        if value["key"] in memory:
-            memory[value["key"]]["value"] = value
+        if data := memory.get(value["key"]):
+            memory[value["key"]] = ValuedRef(
+                ref=data["ref"],
+                value=CachedValue.model_construct(**value),
+            )
 
     return (ref_collection, value_collection, memory)  # type: ignore
 
