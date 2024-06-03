@@ -9,8 +9,9 @@ def create(backend: Backend, **data) -> bool | str:
     info.pop("backend", None)
     try:
         Cacheia.create_cache(
-            NewCachedValue(backend=backend, **info),
-            Infostar(org_handle="", service_handle=""),
+            backend=backend,
+            instance=NewCachedValue(**info),
+            creator=Infostar(org_handle="", service_handle=""),
         )
         return True
     except Exception as e:

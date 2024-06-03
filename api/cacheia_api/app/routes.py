@@ -20,6 +20,7 @@ router = APIRouter(prefix="/cache")
 @router.post("/", status_code=201, tags=["Create"])
 def cache(
     creator: Infostar,
+    backend: Annotated[Backend, Depends(get_backend)],
     instance: NewCachedValue,
 ) -> Created:
     """
@@ -27,7 +28,7 @@ def cache(
     """
 
     try:
-        Cacheia.create_cache(instance, creator)
+        Cacheia.create_cache(creator=creator, instance=instance, backend=backend)
         return UJSONResponse(
             content={"id": instance.key},
             status_code=201,
@@ -63,7 +64,7 @@ def get_all(
     except InvalidExpireRange as e:
         raise HTTPException(
             detail=str(e),
-            status_code=400,
+            status_code=422,
         )
 
 
@@ -123,7 +124,7 @@ def flush_some(
     except InvalidExpireRange as e:
         raise HTTPException(
             detail=str(e),
-            status_code=400,
+            status_code=422,
         )
 
 

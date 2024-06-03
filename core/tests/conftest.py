@@ -2,7 +2,7 @@ import pytest
 from cacheia import Cacheia
 from cacheia_schemas import Backend
 
-UNSUPPORTED = [Backend.REDIS]
+UNSUPPORTED = [Backend.REDIS, Backend.S3]
 
 
 @pytest.fixture(scope="function", autouse=True)
