@@ -6,8 +6,8 @@ class Settings(CacheiaSettings):
     # Uvicorn config
     HOST: str = "0.0.0.0"
     PORT: int = 5000
-    RELOAD: bool = False
-    WORKERS: int = 8
+    RELOAD: bool = True
+    WORKERS: int = 1
 
     # Cache config
     DEFAULT_BACKEND: Backend | None = None

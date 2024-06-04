@@ -4,12 +4,13 @@ Cacheia is a cache abstraction that allows users to retrieve, invalidate and def
 
 ## Structure
 
-The repository is separated into four subfolders:
+The repository is separated into five subfolders:
 
 -   api: exposes a HTTP interface for all cacheia functionalitites
 -   client: a client library that can be used to interact with the cacheia API
 -   core: the core library that implements the cacheia functionalities
--   middleware: a middleware that can be used alongside FastAPI to cache responses
+-   decorators: helper decorators that can be used whithin FastAPI or plain functions to cache responses
+-   schemas: schemas used by the API and the client
 
 ## Docs
 
@@ -18,4 +19,7 @@ For more information about the modules:
 -   [Checkout the API](./api/README.md)
 -   [Checkout the Client](./client/README.md)
 -   [Checkout the Core](./core/README.md)
--   [Checkout the Middleware](./middleware/README.md)
+-   [Checkout the Decorators](./decorators/README.md)
+-   [Checkout the Schemas](./schemas/README.md)
+
+

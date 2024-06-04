@@ -30,7 +30,7 @@ def cache(
     Creates a new cache instance in the chosen backend (e.g. redis, mongo or memory).
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     c.cache(creator=creator, instance=instance)
 
 
@@ -45,7 +45,7 @@ def get_all(
     Gets all cached values for the given backend and filters by the given parameters.
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     return c.get_all(
         creator=creator,
         backend=backend,
@@ -64,7 +64,7 @@ def get(
     Gets the cached value for the given key.
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     return c.get(creator=creator, backend=backend, key=key)
 
 
@@ -79,7 +79,7 @@ def flush_all(
     Optionally accepts a flag that indicates if it should only flushes expired keys.
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     return c.flush_all(
         creator=creator,
         backend=backend,
@@ -98,7 +98,7 @@ def flush_some(
     Flushes all keys in the cache that match the given parameters.
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     return c.flush_some(
         creator=creator,
         backend=backend,
@@ -117,7 +117,7 @@ def flush_key(
     Flushes a specific key.
     """
 
-    c = Client(creator=creator, backend=backend)
+    c = Client(backend=backend)
     return c.flush_key(
         creator=creator,
         backend=backend,
@@ -128,13 +128,11 @@ def flush_key(
 class Client:
     def __init__(
         self,
-        creator: Infostar | None,
         backend: Backend | None,
-        url: str | None = None,
+        url: str = DEFAULT_URL,
     ) -> None:
-        self._default_creator = creator
         self._default_backend = backend
-        self._url = url or DEFAULT_URL
+        self._url = url
 
     def cache(
         self,
@@ -149,7 +147,7 @@ class Client:
         response = httpx.post(
             url=f"{self._url}/cache",
             json={
-                "creator": creator or self._default_creator,
+                "creator": creator,
                 "backend": backend or self._default_backend,
                 "instance": instance,
             },

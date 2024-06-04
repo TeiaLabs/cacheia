@@ -15,7 +15,7 @@ line-length = 88
 profile = "black"
 
 [project]
-name = "cacheia_middleware"
+name = "cacheia_decorator"
 authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
 description = "Cache middleware that allows invalidation and other shenanigans"
 readme = "README.md"

@@ -10,3 +10,19 @@ This module contains the API for the Cacheia project. It exposes a HTTP interfac
 -   <span style="color:orange">**PUT**</span> `/all/`: receives the params `creator: Infostar, only_expired: bool` and flushes all keys in the cache, removing all registers in application DB and backend store. Optionally accepts a flag that indicates if it should only flush expired keys.
 -   <span style="color:orange">**PUT**</span> `/keys/`: receives the params `creator: Infostar, backend: Backend | None, expires_range: str | None, org_handle: str | None, service_handle: str | None` and flushes specific keys based on the given parameters.
 -   <span style="color:orange">**PUT**</span> `/{key}/`: receives the params `key: str, creator: Infostar` and flushes a specific key, removing its register in application DB and backend store.
+
+## Docs
+
+Run the code locally and check-out:
+
+-   [Iterative](http://localhost:5000/docs): for an iterative experience
+-   [Redoc](http://localhost:5000/redoc): for a more detailed view
+
+
+## Running the API
+
+To run the API it is only necessary to install the `cacheia_api` (api folder) and `cacheia` (core folder) packages and run the command:
+
+`python -m cacheia_api`
+
+It will run a local server with reload and one worker configured by default.
