@@ -1,13 +1,17 @@
 from datetime import datetime
 from typing import Iterable
 
-from cacheia_schemas import CachedValue, DeletedResult
+from cacheia_schemas import (
+    CacheClient,
+    CacheClientSettings,
+    CachedValue,
+    DeletedResult,
+    KeyAlreadyExists,
+)
 from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError
 
-from ..exceptions import KeyAlreadyExists
-from ..utils import ts_now
-from .interface import CacheClient, CacheClientSettings
+from .utils import ts_now
 from .memory import MemoryCacheClient, MemoryCacheClientSettings
 
 

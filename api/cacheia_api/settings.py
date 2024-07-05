@@ -1,8 +1,9 @@
-from cacheia.settings import Settings as CacheiaSettings
-from cacheia_schemas import Backend
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from cacheia import SettingsType
 
 
-class Settings(CacheiaSettings):
+class Settings(BaseSettings):
     # Uvicorn config
     HOST: str = "0.0.0.0"
     PORT: int = 5000
@@ -10,7 +11,14 @@ class Settings(CacheiaSettings):
     WORKERS: int = 1
 
     # Cache config
-    DEFAULT_BACKEND: Backend | None = None
+    BACKEND_SETTINGS_JSON: str | None = None
+    BACKEND_SETTINGS: SettingsType | None = None
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 SETS = Settings()  # type: ignore
+if SETS.BACKEND_SETTINGS_JSON is not None:
+    import json
+
+    SETS.BACKEND_SETTINGS = json.loads(SETS.BACKEND_SETTINGS_JSON)

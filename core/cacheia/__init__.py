@@ -1,5 +1,12 @@
+from . import decorator
 from .backends import MemoryCacheClient, MongoCacheClientSettings
-from .cache import Cacheia
-from .exceptions import InvalidBackend, KeyAlreadyExists
+from .cache import Cacheia, CacheType, SettingsType
 
-__all__ = ["Cacheia", "InvalidBackend", "KeyAlreadyExists"]
+__all__ = [
+    "decorator",
+    "Cacheia",
+    "CacheType",
+    "SettingsType",
+    "MemoryCacheClient",
+    "MongoCacheClientSettings",
+]

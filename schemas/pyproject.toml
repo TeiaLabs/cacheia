@@ -15,10 +15,10 @@ profile = "black"
 
 [project]
 name = "cacheia_schemas"
-authors = [ { name = "TeiaLabs", email = "contato@teialabs.com" } ]
+authors = [{ name = "TeiaLabs", email = "contato@teialabs.com" }]
 description = "Schemas for cacheia library"
 readme = "README.md"
-requires-python= ">=3.12"
+requires-python = ">=3.12"
 keywords = ["cache", "schemas", "lib"]
 dynamic = ["version"]
-dependencies = [ "pydantic>2" ]
+dependencies = ["pydantic>=2,<3", "pydantic_settings>=2,<3"]

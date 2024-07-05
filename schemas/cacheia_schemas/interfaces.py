@@ -2,8 +2,9 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Iterable
 
-from cacheia_schemas import CachedValue, DeletedResult
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .values import CachedValue, DeletedResult
 
 
 class CacheClientSettings(BaseSettings):

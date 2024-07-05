@@ -1,16 +1,14 @@
 from typing import Callable
 
+from cacheia_schemas import CacheClient, CacheClientSettings, InvalidSettings
 from pydantic import BaseModel
 
 from .backends import (
-    CacheClient,
-    CacheClientSettings,
     MemoryCacheClient,
     MemoryCacheClientSettings,
     MongoCacheClient,
     MongoCacheClientSettings,
 )
-from .exceptions import InvalidBackend
 
 CacheType = MemoryCacheClient | MongoCacheClient
 SettingsType = MemoryCacheClientSettings | MongoCacheClientSettings
@@ -33,16 +31,19 @@ class Cacheia:
         cls._client_mapping[type(settings)] = lambda sets: client(sets)  # type: ignore
 
     @classmethod
-    def setup(cls, settings: SettingsType | dict) -> None:
+    def setup(cls, settings: SettingsType | dict | None = None) -> None:
         if cls._cache is not None:
             return
+
+        if settings is None:
+            settings = {}
 
         if isinstance(settings, dict):
             any_sets = AnySettings(settings=settings)  # type: ignore
             settings = any_sets.settings
 
         if type(settings) not in cls._client_mapping:
-            raise InvalidBackend(str(type(settings)))
+            raise InvalidSettings(str(type(settings)))
 
         cls._cache = cls._client_mapping[type(settings)](settings)  # type: ignore
 

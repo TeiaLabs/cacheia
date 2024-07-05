@@ -2,11 +2,15 @@ from datetime import datetime
 from multiprocessing import Manager
 from typing import Iterable
 
-from cacheia_schemas import CachedValue, DeletedResult
+from cacheia_schemas import (
+    CacheClient,
+    CacheClientSettings,
+    CachedValue,
+    DeletedResult,
+    KeyAlreadyExists,
+)
 
-from ..exceptions import KeyAlreadyExists
-from ..utils import ts_now
-from .interface import CacheClient, CacheClientSettings
+from .utils import ts_now
 
 
 class MemoryCacheClientSettings(CacheClientSettings):

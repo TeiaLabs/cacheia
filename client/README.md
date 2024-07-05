@@ -5,15 +5,15 @@ This module contains a client that is responsible for communicating with the Cac
 ## Client Methods
 
 -   `cache`: Takes instance (CreateRequest), creator (Infostar) and backend to create a new cache instance in the provided backend.
--   `get_all`: Retrieves all cached values using creator (Infostar), with optional filters backend (Backend), expires_range (str), org_handle (str), and service_handle (str) for backend and expiration specifics.
--   `get`: Fetches the cached value associated with key (str) using creator (Infostar).
--   `flush_all`: Clears all keys from the cache using creator (Infostar), with an only_expired (bool) option to target only expired keys.
--   `flush_some`: Flushes keys based on filters using creator (Infostar), with optional parameters backend (Backend), expires_range (str), org_handle (str), and service_handle (str) to specify which keys to flush.
--   `flush_key`: Removes a single key from the cache and its register in the application DB and backend store using key (str) and creator (Infostar).
+-   `get`: Retrieves all cached values with optional filters group (str), expires_range (tuple[float, float]) and creation_range(tuple[datetime, datetime]);
+-   `get_key`: Fetches the cached value associated with key (str) - Optionally accepts `allow_expired` parameter to return a cached value even if expired.
+-   `flush`: Clears all keys from the cache using with optional filters group (str), expires_range (tuple[float, float]) and creation_range(tuple[datetime, datetime]) and return the count of deleted records.
+-   `flush_key`: Removes a single key from the cache using key (str).
+-   `clear`: Removes all cached values from cache without any validation.
 
 ## Code
 
-The library exposes single functions that are similar to `requests` and `httpx` and also exposes a `Client` class that can be used to define default values for backend and cache API URL.
+The library exposes single functions that are similar to `requests` and `httpx` and also exposes a `Client` class that can be used to define default value for API URL.
 
 ## Examples
 
@@ -21,34 +21,28 @@ To create a cache instance with the client:
 
 ```python
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar, NewCachedValue
+from cacheia_schemas import CachedValue
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
+default_url: str = "http://localhost:5000"
 
+client = Client(url=default_url)
+instance = CachedValue(key="key", value="value")
 
-client = Client(backend=default_backend, url=default_url)
-
-creator = Infostar(org_handle="handle", service_handle="handle")
-instance = NewCachedValue(key="key", value="value")
-
-# Since we are not passing "backend" it will use the default one defined in the Client
-client.cache(creator=creator, instance=instance)
+client.cache(instance=instance)
 ```
 
 Or using the helper functions:
 
 ```python
 from cacheia_client import cache, configure
-from cacheia_schemas import Backend, Infostar, NewCachedValue
+from cacheia_schemas import CachedValue
 
 
 configure("http://localhost:5000")
 
-creator = Infostar(org_handle="handle", service_handle="handle")
-instance = NewCachedValue(key="key", value="value")
-cache(creator=creator, instance=instance, backend=Backend.MEMORY)
+instance = CachedValue(key="key", value="value")
+cache(instance=instance)
 ```
 
 Notice that when calling directly the functions, it is necessary to call "configure"
@@ -60,16 +54,12 @@ To get all cached values:
 
 ```python
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
+default_url: str = "http://localhost:5000"
+client = Client(url=default_url)
 
-client = Client(backend=default_backend, url=default_url)
-
-creator = Infostar(org_handle="handle", service_handle="handle")
-for v in client.get_all(creator=creator):
+for v in client.get_all():
     print(v)
 ```
 
@@ -79,16 +69,11 @@ To get a single cached value:
 
 ```python
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
-
-client = Client(backend=default_backend, url=default_url)
-
-creator = Infostar(org_handle="handle", service_handle="handle")
-print(client.get(creator=creator, key="key"))
+default_url: str = "http://localhost:5000"
+client = Client(url=default_url)
+print(client.get(key="key"))
 ```
 
 ---
@@ -97,16 +82,12 @@ To flush all keys:
 
 ```python
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
+default_url: str = "http://localhost:5000"
+client = Client(url=default_url)
 
-client = Client(backend=default_backend, url=default_url)
-
-creator = Infostar(org_handle="handle", service_handle="handle")
-result = client.flush_all(creator=creator)
+result = client.flush()
 print(result.deleted_count)
 ```
 
@@ -117,17 +98,13 @@ To flush some keys:
 ```python
 from datetime import datetime
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
-
-client = Client(backend=default_backend, url=default_url)
-creator = Infostar(org_handle="handle", service_handle="handle")
+default_url: str = "http://localhost:5000"
+client = Client(url=default_url)
 
 now = datetime.now().timestamp()
-result = client.flush_some(creator=creator, backend=Backend.MEMORY, expires_range=f"{now-10}...{now+10}")
+result = client.flush(expires_range=(now-10, now+10))
 print(result.deleted_count)
 ```
 
@@ -137,15 +114,11 @@ To flush a single key:
 
 ```python
 from cacheia_client import Client
-from cacheia_schemas import Backend, Infostar
 
 
-default_backend: Backend | None = Backend.MEMORY
-default_url: str | None = "http://localhost:5000"
+default_url: str = "http://localhost:5000"
+client = Client(url=default_url)
 
-client = Client(backend=default_backend, url=default_url)
-
-creator = Infostar(org_handle="handle", service_handle="handle")
-result = client.flush_key(creator=creator, key="key")
+result = client.flush_key(key="key")
 print(result.deleted_count)
 ```

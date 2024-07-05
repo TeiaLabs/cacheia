@@ -1,68 +1,68 @@
-# TODO: this are the core tests, need to update to use FastAPI test client
-
+from datetime import datetime
 from typing import Iterable
 
-from cacheia import Cacheia
-from cacheia_schemas import Backend, CachedValue, Infostar, NewCachedValue
+from cacheia_schemas import CachedValue
+from fastapi.testclient import TestClient
 
 
-def create(backend: Backend, **data) -> bool | str:
-    info = {"key": "a", "value": "a", "group": "", **data}
-    info.pop("backend", None)
+def ts_now() -> float:
+    return datetime.now().timestamp()
+
+
+def create(client: TestClient, **data) -> bool | str:
+    info = {"key": "a", "value": "a", **data}
     try:
-        Cacheia.create_cache(
-            backend=backend,
-            instance=NewCachedValue(**info),
-            creator=Infostar(org_handle="", service_handle=""),
-        )
+        r = client.post("/cache/", json=info)
+        r.raise_for_status()
         return True
     except Exception as e:
         return str(e)
 
 
-def get_all(backend: Backend, **kwargs) -> Iterable[CachedValue] | str:
-    filters = {
-        "expires_range": None,
-        "org_handle": None,
-        "service_handle": None,
-        **kwargs,
-    }
+def get_all(client: TestClient) -> Iterable[CachedValue] | str:
     try:
-        iter = Cacheia.get_all(backend=backend, **filters)
-        return iter
+        r = client.get("/cache/")
+        r.raise_for_status()
+        return map(lambda x: CachedValue(**x), r.json())
     except Exception as e:
         return str(e)
 
 
-def get(backend: Backend, key: str) -> CachedValue:
-    return Cacheia.get(backend=backend, key=key)
+def get(client: TestClient, key: str) -> CachedValue:
+    r = client.get(f"/cache/{key}/")
+    r.raise_for_status()
+    return CachedValue.model_construct(**r.json())
 
 
-def flush_all(backend: Backend, expired_only: bool = False) -> int | str:
+def flush_all(client: TestClient) -> int | str:
     try:
-        count = Cacheia.flush_all(backend=backend, expired_only=expired_only)
-        return count.deleted_count
+        r = client.delete("/cache/")
+        r.raise_for_status()
+        count = r.json()
+        return count["deleted_count"]
     except Exception as e:
         return str(e)
 
 
-def flush_some(backend: Backend, **kwargs) -> int | str:
-    filters = {
-        "org_handle": None,
-        "service_handle": None,
-        "expires_range": None,
-        **kwargs,
-    }
+def flush_some(client: TestClient, **kwargs) -> int | str:
     try:
-        count = Cacheia.flush_some(backend=backend, **filters)
-        return count.deleted_count
+        r = client.delete("/cache/", params=kwargs)
+        r.raise_for_status()
+        count = r.json()
+        return count["deleted_count"]
     except Exception as e:
         return str(e)
 
 
-def flush_key(backend: Backend, key: str) -> int | str:
+def flush_key(client: TestClient, key: str) -> int | str:
     try:
-        count = Cacheia.flush_key(backend=backend, key=key)
-        return count.deleted_count
+        r = client.delete(f"/cache/{key}/")
+        r.raise_for_status()
+        count = r.json()
+        return count["deleted_count"]
     except Exception as e:
         return str(e)
+
+
+def clear(client: TestClient):
+    client.delete("/cache/$clear/")

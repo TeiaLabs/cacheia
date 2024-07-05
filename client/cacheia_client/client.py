@@ -1,156 +1,93 @@
+from datetime import datetime
 from typing import Iterable
 
 import httpx
-from cacheia import KeyAlreadyExists
-from cacheia_schemas import (
-    Backend,
-    CachedValue,
-    DeletedResult,
-    Infostar,
-    NewCachedValue,
-)
+from cacheia_schemas import CachedValue, DeletedResult, KeyAlreadyExists
 
 from .exceptions import InvalidInputData
 
 DEFAULT_URL = ""
 
 
-def configure(host: str):
+def configure(url: str):
     global DEFAULT_URL
 
-    DEFAULT_URL = host
+    DEFAULT_URL = url
 
 
-def cache(
-    creator: Infostar,
-    instance: NewCachedValue,
-    backend: Backend | None = None,
-) -> None:
+def cache(instance: CachedValue) -> None:
     """
-    Creates a new cache instance in the chosen backend (e.g. redis, mongo or memory).
+    Creates a new cache instance.
     """
 
-    c = Client(backend=backend)
-    c.cache(creator=creator, instance=instance)
-
-
-def get_all(
-    creator: Infostar,
-    expires_range: str | None = None,
-    org_handle: str | None = None,
-    service_handle: str | None = None,
-    backend: Backend | None = None,
-) -> Iterable[CachedValue]:
-    """
-    Gets all cached values for the given backend and filters by the given parameters.
-    """
-
-    c = Client(backend=backend)
-    return c.get_all(
-        creator=creator,
-        backend=backend,
-        expires_range=expires_range,
-        org_handle=org_handle,
-        service_handle=service_handle,
-    )
+    c = Client()
+    c.cache(instance=instance)
 
 
 def get(
-    creator: Infostar,
-    key: str,
-    backend: Backend | None = None,
-) -> CachedValue:
+    group: str | None = None,
+    expires_range: tuple[float, float] | None = None,
+    creation_range: tuple[datetime, datetime] | None = None,
+) -> Iterable[CachedValue]:
+    """
+    Gets all cached values fitlering by the given parameters.
+    """
+
+    c = Client()
+    return c.get(
+        group=group,
+        expires_range=expires_range,
+        creation_range=creation_range,
+    )
+
+
+def get_key(key: str, allow_expired: bool = False) -> CachedValue:
     """
     Gets the cached value for the given key.
     """
 
-    c = Client(backend=backend)
-    return c.get(creator=creator, backend=backend, key=key)
+    c = Client()
+    return c.get_key(key=key, allow_expired=allow_expired)
 
 
-def flush_all(
-    creator: Infostar,
-    expired_only: bool,
-    backend: Backend | None = None,
+def flush(
+    group: str | None = None,
+    expires_range: tuple[float, float] | None = None,
+    creation_range: tuple[datetime, datetime] | None = None,
 ) -> DeletedResult:
-    """
-    Flushes all keys in the cache.
-
-    Optionally accepts a flag that indicates if it should only flushes expired keys.
-    """
-
-    c = Client(backend=backend)
-    return c.flush_all(
-        creator=creator,
-        backend=backend,
-        expired_only=expired_only,
-    )
-
-
-def flush_some(
-    creator: Infostar,
-    backend: Backend | None = None,
-    expires_range: str | None = None,
-    org_handle: str | None = None,
-    service_handle: str | None = None,
-) -> DeletedResult:
-    """
+    """'
     Flushes all keys in the cache that match the given parameters.
     """
 
-    c = Client(backend=backend)
-    return c.flush_some(
-        creator=creator,
-        backend=backend,
+    c = Client()
+    return c.flush(
+        group=group,
         expires_range=expires_range,
-        org_handle=org_handle,
-        service_handle=service_handle,
+        creation_range=creation_range,
     )
 
 
-def flush_key(
-    creator: Infostar,
-    key: str,
-    backend: Backend | None = None,
-) -> DeletedResult:
+def flush_key(key: str) -> DeletedResult:
     """
     Flushes a specific key.
     """
 
-    c = Client(backend=backend)
-    return c.flush_key(
-        creator=creator,
-        backend=backend,
-        key=key,
-    )
+    c = Client()
+    return c.flush_key(key=key)
 
 
 class Client:
-    def __init__(
-        self,
-        backend: Backend | None,
-        url: str = DEFAULT_URL,
-    ) -> None:
-        self._default_backend = backend
-        self._url = url
+    def __init__(self, url: str = DEFAULT_URL) -> None:
+        self._url = url.rstrip("/")
 
-    def cache(
-        self,
-        creator: Infostar,
-        instance: NewCachedValue,
-        backend: Backend | None = None,
-    ) -> None:
+    def cache(self, instance: CachedValue) -> None:
         """
-        Creates a new cache instance in the chosen backend (e.g. redis, mongo or memory).
+        Creates a new cache instance.
         """
 
         response = httpx.post(
-            url=f"{self._url}/cache",
-            json={
-                "creator": creator,
-                "backend": backend or self._default_backend,
-                "instance": instance,
-            },
+            url=f"{self._url}/cache/",
+            json={"instance": instance},
         )
 
         match response.status_code:
@@ -159,26 +96,26 @@ class Client:
             case 409:
                 raise KeyAlreadyExists(response.json())
 
-    def get_all(
+    def get(
         self,
-        creator: Infostar,
-        expires_range: str | None = None,
-        org_handle: str | None = None,
-        service_handle: str | None = None,
-        backend: Backend | None = None,
+        group: str | None = None,
+        expires_range: tuple[float, float] | None = None,
+        creation_range: tuple[datetime, datetime] | None = None,
     ) -> Iterable[CachedValue]:
         """
-        Gets all cached values for the given backend and filters by the given parameters.
+        Gets all cached values fitlering by the given parameters.
         """
 
+        filters = {
+            "group": group,
+            "expires_range": expires_range,
+            "creation_range": creation_range,
+        }
+        filters = {k: v for k, v in filters.items() if v is not None}
+
         response = httpx.get(
-            url=f"{self._url}/cache",
-            params={
-                "backend": backend or self._default_backend,
-                "expires_range": expires_range,
-                "org_handle": org_handle,
-                "service_handle": service_handle,
-            },
+            url=f"{self._url}/cache/",
+            params=filters,
         )
 
         match response.status_code:
@@ -187,21 +124,14 @@ class Client:
             case _:
                 return map(lambda v: CachedValue.model_construct(**v), response.json())
 
-    def get(
-        self,
-        creator: Infostar,
-        key: str,
-        backend: Backend | None = None,
-    ) -> CachedValue:
+    def get_key(self, key: str, allow_expired: bool = False) -> CachedValue:
         """
         Gets the cached value for the given key.
         """
 
         response = httpx.get(
             url=f"{self._url}/cache/{key}/",
-            params={
-                "backend": backend or self._default_backend,
-            },
+            params={"allow_expired": allow_expired},
         )
 
         match response.status_code:
@@ -212,52 +142,26 @@ class Client:
             case _:
                 return CachedValue.model_construct(**response.json())
 
-    def flush_all(
+    def flush(
         self,
-        creator: Infostar,
-        expired_only: bool,
-        backend: Backend | None = None,
-    ) -> DeletedResult:
-        """
-        Flushes all keys in the cache.
-
-        Optionally accepts a flag that indicates if it should only flushes expired keys.
-        """
-
-        response = httpx.delete(
-            url=f"{self._url}/cache/all/",
-            params={
-                "backend": backend or self._default_backend,
-                "expired_only": expired_only,
-            },
-        )
-
-        match response.status_code:
-            case 422:
-                raise InvalidInputData(response.json())
-            case _:
-                return DeletedResult.model_construct(**response.json())
-
-    def flush_some(
-        self,
-        creator: Infostar,
-        backend: Backend | None = None,
-        expires_range: str | None = None,
-        org_handle: str | None = None,
-        service_handle: str | None = None,
+        group: str | None = None,
+        expires_range: tuple[float, float] | None = None,
+        creation_range: tuple[datetime, datetime] | None = None,
     ) -> DeletedResult:
         """
         Flushes all keys in the cache that match the given parameters.
         """
 
+        filters = {
+            "group": group,
+            "expires_range": expires_range,
+            "creation_range": creation_range,
+        }
+        filters = {k: v for k, v in filters.items() if v is not None}
+
         response = httpx.delete(
-            url=f"{self._url}/cache/some/",
-            params={
-                "backend": backend or self._default_backend,
-                "expires_range": expires_range,
-                "org_handle": org_handle,
-                "service_handle": service_handle,
-            },
+            url=f"{self._url}/cache/",
+            params=filters,
         )
 
         match response.status_code:
@@ -266,25 +170,26 @@ class Client:
             case _:
                 return DeletedResult.model_construct(**response.json())
 
-    def flush_key(
-        self,
-        creator: Infostar,
-        key: str,
-        backend: Backend | None = None,
-    ) -> DeletedResult:
+    def flush_key(self, key: str) -> DeletedResult:
         """
         Flushes a specific key.
         """
 
-        response = httpx.delete(
-            url=f"{self._url}/cache/{key}/",
-            params={
-                "backend": backend or self._default_backend,
-            },
-        )
+        response = httpx.delete(url=f"{self._url}/cache/{key}/")
 
         match response.status_code:
             case 422:
                 raise InvalidInputData(response.json())
             case _:
                 return DeletedResult.model_construct(**response.json())
+
+    def clear(self) -> None:
+        """
+        Clears the entire cache.
+        """
+
+        response = httpx.delete(url=f"{self._url}/cache/$clear/")
+
+        match response.status_code:
+            case 422:
+                raise InvalidInputData(response.json())

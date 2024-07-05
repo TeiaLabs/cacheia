@@ -9,8 +9,8 @@ class KeyAlreadyExists(KeyError):
         super().__init__(self.message)
 
 
-class InvalidBackend(ValueError):
+class InvalidSettings(ValueError):
     def __init__(self, backend_name: str) -> None:
-        self.backend_name = backend_name
+        self.settings_type = backend_name
         self.message = f"Settings type '{backend_name}' is not supported."
         super().__init__(self.message)

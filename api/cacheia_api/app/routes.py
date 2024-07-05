@@ -1,34 +1,34 @@
+from datetime import datetime
 from typing import Annotated, Iterable
 
-from cacheia import Cacheia, InvalidExpireRange, KeyAlreadyExists
-from cacheia_schemas import (
-    Backend,
-    CachedValue,
-    DeletedResult,
-    Infostar,
-    NewCachedValue,
-)
+from cacheia_schemas import CacheClient, CachedValue, DeletedResult, KeyAlreadyExists
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import UJSONResponse
 
+from cacheia import Cacheia
+
+from ..settings import SETS
 from .schemas import Created
-from .utils import get_backend
 
 router = APIRouter(prefix="/cache")
 
 
+def get_instance() -> CacheClient:
+    Cacheia.setup(SETS.BACKEND_SETTINGS)
+    return Cacheia.get()
+
+
 @router.post("/", status_code=201, tags=["Create"])
 def cache(
-    creator: Infostar,
-    backend: Annotated[Backend, Depends(get_backend)],
-    instance: NewCachedValue,
+    cache: Annotated[CacheClient, Depends(get_instance)],
+    instance: CachedValue,
 ) -> Created:
     """
-    Creates a new cache instance in the chosen backend (e.g. redis, mongo or memory).
+    Creates a new cache instance.
     """
 
     try:
-        Cacheia.create_cache(creator=creator, instance=instance, backend=backend)
+        cache.cache(instance=instance)
         return UJSONResponse(
             content={"id": instance.key},
             status_code=201,
@@ -43,43 +43,35 @@ def cache(
 
 
 @router.get("/", status_code=200, tags=["Read"])
-def get_all(
-    # _creator: Infostar,  # Future use for business logic
-    backend: Annotated[Backend, Depends(get_backend)],
-    expires_range: str | None = Query(None),
-    org_handle: str | None = Query(None),
-    service_handle: str | None = Query(None),
+def get(
+    cache: Annotated[CacheClient, Depends(get_instance)],
+    group: str | None = Query(None),
+    expires_range: tuple[float, float] | None = Query(None),
+    creation_range: tuple[datetime, datetime] | None = Query(None),
 ) -> Iterable[CachedValue]:
     """
-    Gets all cached values for the given backend and filters by the given parameters.
+    Gets all cached values that matches the given parameters.
     """
 
-    try:
-        return Cacheia.get_all(
-            backend=backend,
-            expires_range=expires_range,
-            org_handle=org_handle,
-            service_handle=service_handle,
-        )
-    except InvalidExpireRange as e:
-        raise HTTPException(
-            detail=str(e),
-            status_code=422,
-        )
+    return cache.get(
+        group=group,
+        expires_range=expires_range,
+        creation_range=creation_range,
+    )
 
 
 @router.get("/{key}/", status_code=200, tags=["Read"])
 def get_key(
-    # _creator: Infostar,  # Future use for business logic
-    backend: Annotated[Backend, Depends(get_backend)],
+    cache: Annotated[CacheClient, Depends(get_instance)],
     key: str,
+    allow_expired: bool = Query(False),
 ) -> CachedValue:
     """
     Gets the cached value for the given key.
     """
 
     try:
-        return Cacheia.get(backend=backend, key=key)
+        return cache.get_key(key=key, allow_expired=allow_expired)
     except KeyError as e:
         raise HTTPException(
             detail=f"Key '{e}' not found",
@@ -87,55 +79,40 @@ def get_key(
         )
 
 
-@router.delete("/all/", status_code=200, tags=["Delete"])
-def flush_all(
-    # _creator: Infostar,
-    backend: Annotated[Backend, Depends(get_backend)],
-    expired_only: bool = Query(True),
+@router.delete("/", status_code=200, tags=["Delete"])
+def flush(
+    cache: Annotated[CacheClient, Depends(get_instance)],
+    group: str | None = None,
+    expires_range: tuple[float, float] | None = None,
+    creation_range: tuple[datetime, datetime] | None = None,
 ) -> DeletedResult:
     """
-    Flushes all keys in the cache.
-
-    Optionally accepts a flag that indicates if it should only flushes expired keys.
+    Flushes all keys in the cache that matches the given filters.
     """
 
-    return Cacheia.flush_all(backend=backend, expired_only=expired_only)
+    return cache.flush(
+        group=group,
+        expires_range=expires_range,
+        creation_range=creation_range,
+    )
 
 
-@router.delete("/some/", status_code=200, tags=["Delete"])
-def flush_some(
-    # _creator: Infostar,  # Future use for business logic
-    backend: Annotated[Backend, Depends(get_backend)],
-    expires_range: str | None = None,
-    org_handle: str | None = None,
-    service_handle: str | None = None,
-) -> DeletedResult:
+@router.delete("/$clear/", status_code=204, tags=["Delete"])
+def clear(cache: Annotated[CacheClient, Depends(get_instance)]):
     """
-    Flushes all keys in the cache that match the given parameters.
+    Delete all cached values.
     """
 
-    try:
-        return Cacheia.flush_some(
-            backend=backend,
-            expires_range=expires_range,
-            org_handle=org_handle,
-            service_handle=service_handle,
-        )
-    except InvalidExpireRange as e:
-        raise HTTPException(
-            detail=str(e),
-            status_code=422,
-        )
+    cache.clear()
 
 
 @router.delete("/{key}/", status_code=200, tags=["Delete"])
 def flush_key(
-    # _creator: Infostar,  # Future use for business logic
-    backend: Annotated[Backend, Depends(get_backend)],
+    cache: Annotated[CacheClient, Depends(get_instance)],
     key: str,
 ) -> DeletedResult:
     """
     Flushes a specific key.
     """
 
-    return Cacheia.flush_key(backend=backend, key=key)
+    return cache.flush_key(key=key)
