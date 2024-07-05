@@ -1,13 +1,19 @@
 import pytest
-from cacheia import Cacheia
 from cacheia_schemas import Backend
+
+from cacheia import Cacheia
 
 UNSUPPORTED = [Backend.REDIS, Backend.S3]
 
 
 @pytest.fixture(scope="function", autouse=True)
 def clear():
-    for backend in Backend:
-        if backend in UNSUPPORTED:
-            continue
-        Cacheia.flush_all(backend=backend, expired_only=False)
+    c = Cacheia._cache
+    if c is not None:
+        c.clear()
+
+    yield None
+
+    c = Cacheia._cache
+    if c is not None:
+        c.clear()

@@ -1,66 +1,117 @@
+from datetime import datetime
 from typing import Iterable
 
+from cacheia_schemas import Backend, CachedValue
+
 from cacheia import Cacheia
-from cacheia_schemas import Backend, CachedValue, Infostar, NewCachedValue
 
 
-def create(backend: Backend, **data) -> bool | str:
-    info = {"key": "a", "value": "a", "group": "", **data}
+def create(backend: Backend, use_multi_proc: bool = False, **data) -> bool | str:
+    info = {"key": "a", "value": "a", **data}
     info.pop("backend", None)
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
+
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
+
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
     try:
-        Cacheia.create_cache(
-            backend=backend,
-            instance=NewCachedValue(**info),
-            creator=Infostar(org_handle="", service_handle=""),
-        )
+        instance.cache(CachedValue(**info))
         return True
     except Exception as e:
         return str(e)
 
 
-def get_all(backend: Backend, **kwargs) -> Iterable[CachedValue] | str:
-    filters = {
-        "expires_range": None,
-        "org_handle": None,
-        "service_handle": None,
-        **kwargs,
-    }
+def get_all(
+    backend: Backend, use_multi_proc: bool = False, **kwargs
+) -> Iterable[CachedValue] | str:
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
+
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
+
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
     try:
-        iter = Cacheia.get_all(backend=backend, **filters)
+        iter = instance.get(**kwargs)
         return iter
     except Exception as e:
         return str(e)
 
 
-def get(backend: Backend, key: str) -> CachedValue:
-    return Cacheia.get(backend=backend, key=key)
+def get(backend: Backend, key: str, use_multi_proc: bool = False) -> CachedValue:
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
+
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
+
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
+    return instance.get_key(key)
 
 
-def flush_all(backend: Backend, expired_only: bool = False) -> int | str:
+def flush_all(
+    backend: Backend, expired_only: bool = False, use_multi_proc: bool = False
+) -> int | str:
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
+
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
+
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
     try:
-        count = Cacheia.flush_all(backend=backend, expired_only=expired_only)
+        if expired_only:
+            count = instance.flush()
+            return count.deleted_count
+        else:
+            now = datetime.now()
+            end = now.timestamp() * 10
+            start = now.timestamp() - end
+            count = instance.flush(expires_range=(start, end))
+            return count.deleted_count
+    except Exception as e:
+        return str(e)
+
+
+def flush_some(backend: Backend, group: str, use_multi_proc: bool = False) -> int | str:
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
+
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
+
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
+    try:
+        count = instance.flush(group=group)
         return count.deleted_count
     except Exception as e:
         return str(e)
 
 
-def flush_some(backend: Backend, **kwargs) -> int | str:
-    filters = {
-        "org_handle": None,
-        "service_handle": None,
-        "expires_range": None,
-        **kwargs,
-    }
-    try:
-        count = Cacheia.flush_some(backend=backend, **filters)
-        return count.deleted_count
-    except Exception as e:
-        return str(e)
+def flush_key(backend: Backend, key: str, use_multi_proc: bool = False) -> int | str:
+    sets = {}
+    if backend == Backend.MONGO:
+        sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
+    if use_multi_proc:
+        sets["CACHE_USE_MULTIPROCESSING"] = True
 
-def flush_key(backend: Backend, key: str) -> int | str:
+    Cacheia.setup(sets)
+    instance = Cacheia.get()
     try:
-        count = Cacheia.flush_key(backend=backend, key=key)
+        count = instance.flush_key(key)
         return count.deleted_count
     except Exception as e:
         return str(e)

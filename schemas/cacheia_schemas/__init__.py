@@ -12,34 +12,12 @@ class Backend(StrEnum):
     S3 = auto()
 
 
-class Infostar(BaseModel):
-    org_handle: str
-    service_handle: str
-
-
-class NewCachedValue(BaseModel):
-    key: str
-    value: Any
-    group: str = ""
-    expires_at: float | None = None
-
-
-class Ref(BaseModel):
-    key: str
-    group: str
-    expires_at: float | None = None
-    created_by: Infostar
-    created_at: datetime = Field(default_factory=datetime.now)
-
-
 class CachedValue(BaseModel):
     key: str
     value: Any
-
-
-class ValuedRef(BaseModel):
-    ref: Ref
-    value: CachedValue
+    group: str | None = None
+    expires_at: float | None = None
+    created_at: datetime = Field(default_factory=datetime.now)
 
 
 class DeletedResult(BaseModel):
