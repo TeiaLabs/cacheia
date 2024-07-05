@@ -19,7 +19,6 @@ For more information about the modules:
 -   [Checkout the API](./api/README.md)
 -   [Checkout the Client](./client/README.md)
 -   [Checkout the Core](./core/README.md)
--   [Checkout the Decorators](./decorators/README.md)
 -   [Checkout the Schemas](./schemas/README.md)
 
 
