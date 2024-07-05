@@ -1,5 +1,3 @@
-from cacheia_schemas import Backend
-
 from .templates import (
     create_test_template,
     flush_all_test_template,
@@ -11,24 +9,24 @@ from .templates import (
 
 
 def test_create():
-    create_test_template(Backend.MONGO)
+    create_test_template("mongo")
 
 
 def test_get_all():
-    get_all_test_template(Backend.MONGO)
+    get_all_test_template("mongo")
 
 
 def test_get():
-    get_test_template(Backend.MONGO)
+    get_test_template("mongo")
 
 
 def test_flush_all():
-    flush_all_test_template(Backend.MONGO)
+    flush_all_test_template("mongo")
 
 
 def test_flush_key():
-    flush_key_test_template(Backend.MONGO)
+    flush_key_test_template("mongo")
 
 
 def test_flush_some():
-    flush_some_test_template(Backend.MONGO)
+    flush_some_test_template("mongo")

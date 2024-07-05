@@ -1,9 +1,10 @@
+from typing import Literal
+
 import pytest
-from cacheia_schemas import Backend
 
 from cacheia import Cacheia
 
-UNSUPPORTED = [Backend.REDIS, Backend.S3]
+Backends = Literal["mongo", "memory"]
 
 
 @pytest.fixture(scope="function", autouse=True)

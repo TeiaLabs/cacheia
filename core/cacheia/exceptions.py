@@ -1,6 +1,3 @@
-from cacheia_schemas import Backend
-
-
 class KeyAlreadyExists(KeyError):
     """
     Raised when a key already exists in the cache
@@ -14,8 +11,6 @@ class KeyAlreadyExists(KeyError):
 
 class InvalidBackend(ValueError):
     def __init__(self, backend_name: str) -> None:
-        backend_names = "\n-> ".join(Backend)
-
         self.backend_name = backend_name
-        self.message = f"Settings type '{backend_name}' is not supported. Supported backends are:\n-> {backend_names}."
+        self.message = f"Settings type '{backend_name}' is not supported."
         super().__init__(self.message)

@@ -1,16 +1,18 @@
 from datetime import datetime
 from typing import Iterable
 
-from cacheia_schemas import Backend, CachedValue
+from cacheia_schemas import CachedValue
 
 from cacheia import Cacheia
 
+from .conftest import Backends
 
-def create(backend: Backend, use_multi_proc: bool = False, **data) -> bool | str:
+
+def create(backend: Backends, use_multi_proc: bool = False, **data) -> bool | str:
     info = {"key": "a", "value": "a", **data}
     info.pop("backend", None)
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
@@ -26,10 +28,10 @@ def create(backend: Backend, use_multi_proc: bool = False, **data) -> bool | str
 
 
 def get_all(
-    backend: Backend, use_multi_proc: bool = False, **kwargs
+    backend: Backends, use_multi_proc: bool = False, **kwargs
 ) -> Iterable[CachedValue] | str:
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
@@ -44,9 +46,9 @@ def get_all(
         return str(e)
 
 
-def get(backend: Backend, key: str, use_multi_proc: bool = False) -> CachedValue:
+def get(backend: Backends, key: str, use_multi_proc: bool = False) -> CachedValue:
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
@@ -58,10 +60,10 @@ def get(backend: Backend, key: str, use_multi_proc: bool = False) -> CachedValue
 
 
 def flush_all(
-    backend: Backend, expired_only: bool = False, use_multi_proc: bool = False
+    backend: Backends, expired_only: bool = False, use_multi_proc: bool = False
 ) -> int | str:
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
@@ -83,9 +85,11 @@ def flush_all(
         return str(e)
 
 
-def flush_some(backend: Backend, group: str, use_multi_proc: bool = False) -> int | str:
+def flush_some(
+    backend: Backends, group: str, use_multi_proc: bool = False
+) -> int | str:
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
@@ -100,9 +104,9 @@ def flush_some(backend: Backend, group: str, use_multi_proc: bool = False) -> in
         return str(e)
 
 
-def flush_key(backend: Backend, key: str, use_multi_proc: bool = False) -> int | str:
+def flush_key(backend: Backends, key: str, use_multi_proc: bool = False) -> int | str:
     sets = {}
-    if backend == Backend.MONGO:
+    if backend == "mongo":
         sets["CACHE_DB_URI"] = "mongodb://localhost:27017/test"
 
     if use_multi_proc:
