@@ -11,10 +11,10 @@ def main():
     uvicorn.run(
         app="cacheia_api.app:create_app",
         factory=True,
-        host=SETS.HOST,
-        port=SETS.PORT,
-        reload=SETS.RELOAD,
-        workers=SETS.WORKERS,
+        host=SETS.CACHEIA_HOST,
+        port=SETS.CACHEIA_PORT,
+        reload=SETS.CACHEIA_RELOAD,
+        workers=SETS.CACHEIA_WORKERS,
     )
 
 

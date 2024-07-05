@@ -6,10 +6,10 @@ Cacheia has all the core functionality for the "cacheia" package. It exposes a s
 
 Cacheia mainly exposes one interface to interact with all backends and some custom exceptions:
 
--   Cacheia: The main interface to interact with all backends.
--   InvalidSettings: Exception raised when an invalid settings class type is passed to `Cacheia.setup` method.
--   KeyAlreadyExists: Exception raised when a key already exists in the cache and the user tries to set it again.
--   decorator: Module that exposes a decorator to cache function calls.
+- Cacheia: The main interface to interact with all backends.
+- InvalidSettings: Exception raised when an invalid settings class type is passed to `Cacheia.setup` method.
+- KeyAlreadyExists: Exception raised when a key already exists in the cache and the user tries to set it again.
+- decorator: Module that exposes a decorator to cache function calls.
 
 ## Examples
 
@@ -50,7 +50,7 @@ from cacheia import Cacheia
 
 Cacheia.setup()
 cache = Cacheia.get()
-cached_value = cache.get(key="key")
+cached_value = cache.get_key("key")
 print(cached_value)
 ```
 

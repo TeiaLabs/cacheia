@@ -77,7 +77,9 @@ def flush_key(key: str) -> DeletedResult:
 
 
 class Client:
-    def __init__(self, url: str = DEFAULT_URL) -> None:
+    def __init__(self, url: str | None = None) -> None:
+        if url is None:
+            url = DEFAULT_URL
         self._url = url.rstrip("/")
 
     def cache(self, instance: CachedValue) -> None:
@@ -85,9 +87,9 @@ class Client:
         Creates a new cache instance.
         """
 
-        response = httpx.post(
+        response = httpx.put(
             url=f"{self._url}/cache/",
-            json={"instance": instance},
+            json=instance.model_dump(mode="json"),
         )
 
         match response.status_code:

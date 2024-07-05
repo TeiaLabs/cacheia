@@ -14,11 +14,11 @@ router = APIRouter(prefix="/cache")
 
 
 def get_instance() -> CacheClient:
-    Cacheia.setup(SETS.BACKEND_SETTINGS)
+    Cacheia.setup(SETS.CACHEIA_BACKEND_SETTINGS)
     return Cacheia.get()
 
 
-@router.post("/", status_code=201, tags=["Create"])
+@router.put("/", status_code=201, tags=["Create"])
 def cache(
     cache: Annotated[CacheClient, Depends(get_instance)],
     instance: CachedValue,

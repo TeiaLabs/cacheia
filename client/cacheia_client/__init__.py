@@ -1,12 +1,2 @@
-from .client import (
-    Client,
-    KeyAlreadyExists,
-    cache,
-    configure,
-    flush_all,
-    flush_key,
-    flush_some,
-    get,
-    get_all,
-)
+from .client import Client, cache, configure, flush_key, get
 from .exceptions import InvalidInputData
