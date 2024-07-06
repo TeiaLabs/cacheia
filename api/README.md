@@ -2,6 +2,14 @@
 
 This module contains the API for the Cacheia project. It exposes a HTTP interface to interact with all cacheia functionalities.
 
+## Installation
+
+Install core with "core" optional to download core dependency:
+
+```bash
+pip install -e ./api[core]
+```
+
 ## API Endpoints
 
 -   <span style="color:green">**POST**</span> `/cache/`: receives the body parameter `instance: CachedValue` and creates a new cache instance in the configured backend.
@@ -17,7 +25,6 @@ Run the code locally and check-out:
 
 -   [Iterative](http://localhost:5000/docs): for an iterative experience
 -   [Redoc](http://localhost:5000/redoc): for a more detailed view
-
 
 ## Running the API
 

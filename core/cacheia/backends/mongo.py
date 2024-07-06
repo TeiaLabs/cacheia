@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Iterable
 
+import pymongo
 from cacheia_schemas import (
     CacheClient,
     CacheClientSettings,
@@ -9,10 +10,10 @@ from cacheia_schemas import (
     KeyAlreadyExists,
 )
 from pymongo import MongoClient
-from pymongo.errors import DuplicateKeyError
+from pymongo.errors import DuplicateKeyError, OperationFailure
 
-from .utils import ts_now
 from .memory import MemoryCacheClient, MemoryCacheClientSettings
+from .utils import ts_now
 
 
 class MongoCacheClientSettings(CacheClientSettings):
@@ -28,6 +29,10 @@ class MongoCacheClient(CacheClient):
         self._client = MongoClient(settings.CACHE_DB_URI)
         self._database = self._client[settings.CACHE_DB_NAME]
         self._coll = self._database[settings.CACHE_COLLECTION]
+        try:
+            self._coll.create_index(("group", pymongo.TEXT))
+        except OperationFailure:
+            pass
 
         if not settings.CACHE_USE_LOCAL_MEM or not settings.CACHE_PRELOAD:
             self._mem = None

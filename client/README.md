@@ -2,6 +2,14 @@
 
 This module contains a client that is responsible for communicating with the Cacheia API. It is a simple wrapper around the API endpoints, providing a more user-friendly interface for the user.
 
+## Installation
+
+Install core with "schemas" optional to download schemas dependencies:
+
+```bash
+pip install -e ./client[schemas]
+```
+
 ## Client Methods
 
 -   `cache`: Takes instance (CreateRequest), creator (Infostar) and backend to create a new cache instance in the provided backend.
