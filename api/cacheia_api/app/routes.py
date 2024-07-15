@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Annotated, Iterable
+from urllib.parse import unquote_plus
 
 from cacheia_schemas import CacheClient, CachedValue, DeletedResult, KeyAlreadyExists
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -70,8 +71,11 @@ def get_key(
     Gets the cached value for the given key.
     """
 
+    print("OOGABOOGA")
+    print(key)
+    decoded_key = unquote_plus(key)
     try:
-        return cache.get_key(key=key, allow_expired=allow_expired)
+        return cache.get_key(key=decoded_key, allow_expired=allow_expired)
     except KeyError as e:
         raise HTTPException(
             detail=f"Key '{e}' not found",
@@ -115,4 +119,5 @@ def flush_key(
     Flushes a specific key.
     """
 
-    return cache.flush_key(key=key)
+    decoded_key = unquote_plus(key)
+    return cache.flush_key(key=decoded_key)

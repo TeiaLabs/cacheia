@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import Iterable
+from urllib.parse import quote_plus
 
 import httpx
 from cacheia_schemas import CachedValue, DeletedResult, KeyAlreadyExists
@@ -131,8 +132,9 @@ class Client:
         Gets the cached value for the given key.
         """
 
+        encoded_key = quote_plus(key)
         response = httpx.get(
-            url=f"{self._url}/cache/{key}/",
+            url=f"{self._url}/cache/{encoded_key}/",
             params={"allow_expired": allow_expired},
         )
 
@@ -177,7 +179,8 @@ class Client:
         Flushes a specific key.
         """
 
-        response = httpx.delete(url=f"{self._url}/cache/{key}/")
+        encoded_key = quote_plus(key)
+        response = httpx.delete(url=f"{self._url}/cache/{encoded_key}/")
 
         match response.status_code:
             case 422:
