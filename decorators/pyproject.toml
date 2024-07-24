@@ -24,12 +24,6 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 dev = ["black>=24,<25", "isort>=5,<6", "pytest>=8,<9"]
-local = [
-    "cacheia@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=core",
-]
-remote = [
-    "cacheia_client@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=client",
-]
-schemas = [
-    "cacheia_schemas@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=schemas",
-]
+local = ["cacheia==1.0.0"]
+remote = ["cacheia_client==1.0.0"]
+schemas = ["cacheia_schemas==1.0.0"]

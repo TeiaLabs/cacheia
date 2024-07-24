@@ -32,5 +32,5 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["black>=24,<25", "isort>=5,<6", "pytest>=8,<9"]
 schemas = [
-    "cacheia_schemas@git+ssh://git@github.com/TeiaLabs/cacheia.git#subdirectory=schemas",
+    "cacheia_schemas==1.0.0",
 ]
